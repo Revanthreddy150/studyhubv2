@@ -242,8 +242,9 @@
                         <i class="fa-solid ${path.length === 0 ? 'fa-graduation-cap' : 'fa-folder-open'}" style="font-size:2.5rem; color:var(--primary); margin-bottom:15px;"></i>
                         <h3 style="font-size:1rem;">${k}</h3>
                         <div style="margin-top:20px; display:flex; justify-content:center; gap:20px; color:#aaa;">
-                            <i class="fa-solid fa-sort" onclick="event.stopPropagation(); setRank('${k}')" title="Sort"></i>
-                            <i class="fa-solid fa-trash" style="color:var(--error)" onclick="event.stopPropagation(); deleteNode('${k}')" title="Delete"></i>
+                            <i class="fa-solid fa-pen-to-square" style="color:var(--blue); cursor:pointer;" onclick="event.stopPropagation(); renameNode('${k}')" title="Edit Repository / Folder Name"></i>
+                            <i class="fa-solid fa-sort" style="cursor:pointer;" onclick="event.stopPropagation(); setRank('${k}')" title="Sort Order"></i>
+                            <i class="fa-solid fa-trash" style="color:var(--error); cursor:pointer;" onclick="event.stopPropagation(); deleteNode('${k}')" title="Delete"></i>
                         </div>
                     </div>`;
             });
@@ -263,6 +264,31 @@
         path.forEach(p => t = t[p]);
         
         t[name] = path.length >= 1 ? { _type:'subject', units:[], links:[], vids:[], _rank: 99 } : { _rank: 99 };
+        await set(dataRef, core);
+    };
+
+    window.renameNode = async (oldName) => {
+        const newName = prompt(`Edit name for "${oldName}":`, oldName);
+        if(!newName || newName.trim() === '' || newName.trim() === oldName) return;
+        
+        const trimmed = newName.trim();
+        if(trimmed.startsWith('_')) {
+            alert("Names starting with '_' are reserved.");
+            return;
+        }
+
+        let t = core;
+        path.forEach(p => t = t[p]);
+
+        if(t[trimmed]) {
+            alert(`An item named "${trimmed}" already exists here.`);
+            return;
+        }
+
+        // Copy tree under new name & delete old key
+        t[trimmed] = t[oldName];
+        delete t[oldName];
+
         await set(dataRef, core);
     };
 
