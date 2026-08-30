@@ -536,7 +536,8 @@
 
     window.shareUnit = (pathStr, name) => {
       const parts = pathStr.split('/').filter(Boolean).map(encodeURIComponent);
-      const shareUrl = `${window.location.origin}/#/Home/${parts.join('/')}/${encodeURIComponent(name)}`;
+      const baseUrl = window.location.href.split('#')[0].replace(/\/$/, '');
+      const shareUrl = `${baseUrl}/#/Home/${parts.join('/')}/${encodeURIComponent(name)}`;
       
       if (navigator.clipboard) {
         navigator.clipboard.writeText(shareUrl);
